@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agenda</title>
+</head>
+<body>
+    <h2>Agendamentos</h2>
+    <ul style="font-size: 18px">
+        {% for evento in eventos %}
+
+            <li>{{evento.titulo}} - {{evento.get_data_evento}}</li>
+        {% endfor %}
+    </ul>
+    <!-- <b>{{evento.titulo}} - {{evento.data_evento}}</b> busca um evento específico -->
+</body>
+</html>

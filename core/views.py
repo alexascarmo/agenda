@@ -1,9 +1,11 @@
 # Create your views here.
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from core.models import Evento
 
+# def index(request):
+#     return redirect('/agenda/')
 
 def titulo_evento(request, titulo):
     evento = Evento.objects.get(titulo=titulo)

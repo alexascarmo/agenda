@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Agenda</title>
-</head>
-<body>
+{% extends "model-page.html" %}
+
+{% block content %}
     <h2>Agendamentos</h2>
     <ul style="font-size: 18px">
         {% for evento in eventos %}
@@ -13,5 +9,4 @@
         {% endfor %}
     </ul>
     <!-- <b>{{evento.titulo}} - {{evento.data_evento}}</b> busca um evento específico -->
-</body>
-</html>
+{% endblock %}

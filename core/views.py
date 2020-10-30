@@ -43,7 +43,11 @@ def lista_eventos(request):
 
 @login_required(login_url='/login')
 def evento(request):
-    return render(request, 'evento.html')
+    id_evento = request.GET.get('id')
+    dados = {}
+    if id_evento:
+        dados['evento'] = Evento.objects.get(id=id_evento)
+    return render(request, 'evento.html', dados)
 
 @login_required(login_url='/login/')
 def submit_evento(request):
@@ -51,12 +55,30 @@ def submit_evento(request):
         titulo = request.POST.get('titulo')
         data_evento = request.POST.get('data_evento')
         descricao = request.POST.get('descricao')
+        local = request.POST.get('local')
         usuario = request.user
-        Evento.objects.create(titulo=titulo,
+        id_evento = request.POST.get('id_evento')
+        if id_evento:
+            Evento.objects.filter(id=id_evento).update(titulo=titulo,
+                                                       data_evento=data_evento,
+                                                       descricao=descricao,
+                                                       local=local)
+        else:
+            Evento.objects.create(titulo=titulo,
                               data_evento=data_evento,
                               descricao=descricao,
+                              local=local,
                               usuario=usuario)
     return redirect('/')
+
+@login_required(login_url='/login/')
+def delete_evento(request, id_evento):
+    usuario = request.user
+    evento = Evento.objects.get(id=id_evento)
+    if usuario == evento.usuario:
+        evento.delete()
+    return redirect('/')
+
 def titulo_evento(request, titulo):
     evento = Evento.objects.get(titulo=titulo)
     return HttpResponse('O local do evento é: {} e na data {}'.format(evento.local, evento.data_evento))

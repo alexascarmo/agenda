@@ -1,8 +1,10 @@
 # Create your views here.
+from datetime import datetime, timedelta
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect
 
 from core.models import Evento
@@ -32,7 +34,9 @@ def submit_login(request):
 @login_required(login_url='/login/')
 def lista_eventos(request):
     usuario = request.user
-    evento = Evento.objects.filter(usuario=usuario)
+    data_atual = datetime.now() - timedelta(hours=3)
+    evento = Evento.objects.filter(usuario=usuario,
+                                   data_evento__gt=data_atual) #__gt é o mesmo que > e __lt é o mesmo que <
     dados = {'eventos':evento}
     return render(request, 'agenda.html', dados)
 
@@ -74,12 +78,23 @@ def submit_evento(request):
 @login_required(login_url='/login/')
 def delete_evento(request, id_evento):
     usuario = request.user
-    evento = Evento.objects.get(id=id_evento)
+    try:
+        evento = Evento.objects.get(id=id_evento)
+    except Exception:
+        raise Http404()
     if usuario == evento.usuario:
         evento.delete()
+    else:
+        raise Http404()
     return redirect('/')
 
 def titulo_evento(request, titulo):
     evento = Evento.objects.get(titulo=titulo)
     return HttpResponse('O local do evento é: {} e na data {}'.format(evento.local, evento.data_evento))
     #return HttpResponse('O local do evento é: {}'.format(evento.local))
+
+@login_required(login_url='/login/')
+def json_lista_evento(request):
+    usuario = request.user
+    evento = Evento.objects.filter(usuario=usuario).values('id', 'titulo')
+    return JsonResponse(list(evento), safe=False)
